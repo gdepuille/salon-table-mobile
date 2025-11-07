@@ -1,0 +1,6 @@
+.cache/
+.DS_Store
+*.xcuserstate
+
+fastlane/report.xml
+fastlane/test_output/
