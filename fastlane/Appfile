@@ -1,0 +1,5 @@
+app_identifier("io.depuille.TableSalon") # Identifiant du bundle
+apple_id(ENV["APPLE_ID"]) # Ton Apple ID (email)
+itc_team_id(ENV["ITC_TEAM_ID"]) # ID App Store Connect
+team_id(ENV["TEAM_ID"]) # ID Developer Team
+

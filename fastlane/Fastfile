@@ -1,0 +1,23 @@
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Build and run unit tests"
+  lane :ci_build do
+    scan(
+      scheme: "TableSalon",
+      device: "iPhone 17 Pro",
+      clean: true
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    build_app(
+      scheme: "TableSalon",
+      export_method: "app-store"
+    )
+    upload_to_testflight
+  end
+
+end
