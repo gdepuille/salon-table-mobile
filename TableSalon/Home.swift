@@ -10,79 +10,75 @@ internal import Combine
 
 
 struct Home: View {
-    @StateObject private var vm = SampleViewModel()
+    @StateObject private var vm = HomeViewModel()
 
     var body: some View {
 
         VStack(spacing: 16) {
-            Text("TableSalon")
-                .font(.largeTitle)
-                .bold()
-            
             HStack {
-                Button("Toggle LEDs", action: {
-                    Task {
-                        await vm.toggleLeds()
-                    }
-                })
-                .tint(vm.enableLeds ? Color.green : Color.red)
-                .buttonStyle(.borderedProminent)
-                .scaledToFit()
-                .padding()
+                Text(vm.infos?.name ?? "Loading...")
+                    .font(.largeTitle)
+                    .bold()
                 
-                Text(vm.enableLeds ? "ON" : "OFF")
-                    .padding()
-            }
-            
-            if let error = vm.errorMessage {
-                Text(error).foregroundColor(.red)
-            } else {
-                ControlGroup("Foo", systemImage: "magnifyingglass") {
-                    Button("Increase", systemImage: "plus",
-                           action: {
-                                Task {
-                                    await vm.next()
-                                }
-                            }
-                    )
-                    Button("Decrease", systemImage: "minus",
-                           action: {
-                                Task {
-                                    await vm.previous()
-                                }
-                            }
-                    )
+                if vm.isLoading {
+                    ProgressView()
                 }
-            
                 Spacer()
                 
-                if let sample = vm.sample {
-                    Text("ID de post: \(sample.id)")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                    
-                    Text(sample.title)
-                        .font(.body)
-                        .bold()
-                        .foregroundColor(.secondary)
-                    
-                    Text(sample.body)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                }
+                Button("Settings", action: {})
+                    .buttonStyle(.borderedProminent)
+                    .scaledToFit()
+            }
+            HStack {
+                Text(vm.infos?.version ?? "...")
+                    .font(.title3)
+                Spacer()
+                
+                Text(vm.infos?.hashGit ?? "...")
+                    .font(.title3)
             }
             
-            if vm.isLoading {
-                ProgressView("Chargement")
+            Toggle(isOn: $vm.enableLeds) {
+                Text("Toggle LEDs")
+                    .font(.title2)
             }
-
+            
+            HStack {
+                Text("Intensity")
+                    .font(.title2)
+                
+                Slider(value: $vm.intensity, in: 0...100)
+            }
+            
+            TabView(selection: $vm.selectedTab) {
+                
+                SimpleColorTab()
+                    .tag(TabSelected.COLOR)
+                    .tabItem {
+                        Label("Color", systemImage: "circle.lefthalf.filled.righthalf.striped.horizontal")
+                    }
+                
+                AnimateTab()
+                    .tag(TabSelected.ANIMATE)
+                    .tabItem {
+                        Label("Animate", systemImage: "star.circle.fill")
+                    }
+                
+                GameTab()
+                    .tag(TabSelected.GAME)
+                    .tabItem {
+                        Label("Game", systemImage: "gamecontroller.circle")
+                    }
+            }
         }
-        
         .task {
-            await vm.next()
+            await vm.loadInfos()
+            await vm.loadStatus()
         }
+        .padding()
     }
 }
+
 
 #Preview {
     Home()
